@@ -12,11 +12,19 @@ export default function Dashboard() {
   const [tickets, setTickets] = useState([]);
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
+  const loadTickets = () => {
+    setLoading(true);
+    setError('');
     api.get('/tickets')
       .then(({ data }) => setTickets(data))
+      .catch(() => setError('Could not load tickets. Check your connection and try again.'))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadTickets();
   }, []);
 
   const filtered = filter === 'all' ? tickets : tickets.filter((t) => t.status === filter);
@@ -77,6 +85,13 @@ export default function Dashboard() {
       {/* Table */}
       {loading ? (
         <div className="card flex items-center justify-center h-48 text-gray-400 text-sm">Loading tickets…</div>
+      ) : error ? (
+        <div className="card p-12 text-center">
+          <p className="text-red-600 font-medium">{error}</p>
+          <button type="button" onClick={loadTickets} className="btn-secondary mt-4">
+            Try again
+          </button>
+        </div>
       ) : filtered.length === 0 ? (
         <div className="card p-16 text-center">
           <svg className="w-12 h-12 text-gray-200 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

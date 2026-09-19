@@ -18,9 +18,15 @@ export default function CreateTicket() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    const title = form.title.trim();
+    const description = form.description.trim();
+    if (!title || !description) {
+      setError('Title and description are required.');
+      return;
+    }
     setLoading(true);
     try {
-      const { data } = await api.post('/tickets', form);
+      const { data } = await api.post('/tickets', { ...form, title, description });
       navigate(`/tickets/${data.id}`);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to submit ticket.');
@@ -59,6 +65,7 @@ export default function CreateTicket() {
               required
               maxLength={255}
             />
+            <p className="text-right text-xs text-gray-400 mt-1">{form.title.length}/255</p>
           </div>
 
           <div>
@@ -88,7 +95,9 @@ export default function CreateTicket() {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               required
+              maxLength={5000}
             />
+            <p className="text-right text-xs text-gray-400 mt-1">{form.description.length}/5,000</p>
           </div>
 
           <div className="flex items-center gap-3 pt-1">

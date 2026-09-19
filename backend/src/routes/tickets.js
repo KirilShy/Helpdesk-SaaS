@@ -39,6 +39,12 @@ router.post('/', auth, async (req, res) => {
   if (!title?.trim() || !description?.trim()) {
     return res.status(400).json({ error: 'title and description are required' });
   }
+  if (title.trim().length > 255) {
+    return res.status(400).json({ error: 'title must be 255 characters or fewer' });
+  }
+  if (description.trim().length > 5000) {
+    return res.status(400).json({ error: 'description must be 5,000 characters or fewer' });
+  }
 
   const valid = ['low', 'medium', 'high', 'urgent'];
   const { rows } = await db.query(
